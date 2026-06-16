@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinoko AI Director — Operator Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --espresso:   #1A0F0A;
+    --cream:      #F5EFE6;
+    --amber:      #C4622D;
+    --amber-soft: #D4B896;
+    --slate:      #8A9BA8;
+    --ink:        #2C1A12;
+    --mist:       #EDE7DC;
+    --sidebar-w:  260px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--espresso);
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 40px;
+    z-index: 100;
+  }
+
+  .sidebar-brand {
+    padding: 28px 24px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .sidebar-brand .logo-mark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--cream);
+    letter-spacing: 0.01em;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .sidebar-brand .version-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-top: 4px;
+    display: block;
+  }
+
+  .nav-section { margin-top: 24px; }
+
+  .nav-section-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+    padding: 0 24px 8px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 24px;
+    color: rgba(245,239,230,0.6);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    border-left: 2px solid transparent;
+    transition: color 0.15s;
+  }
+
+  .nav-link .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--cream);
+    border-left-color: var(--amber);
+  }
+
+  .nav-link.active .nav-dot { background: var(--amber); }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: 800px;
+    padding: 60px 64px 120px;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--amber-soft);
+  }
+
+  .page-eyebrow {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    line-height: 1.1;
+    color: var(--espresso);
+    margin-bottom: 16px;
+  }
+
+  .page-desc {
+    color: #5C3D2E;
+    font-size: 15px;
+    max-width: 540px;
+    font-weight: 300;
+  }
+
+  .badge-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-amber { background: rgba(196,98,45,0.12); color: var(--amber); }
+  .badge-slate { background: rgba(138,155,168,0.15); color: var(--slate); }
+
+  /* ── SECTIONS ── */
+  .section {
+    margin-bottom: 64px;
+    padding-top: 8px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: var(--espresso);
+    line-height: 1.2;
+    border-left: 3px solid var(--amber);
+    padding-left: 14px;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink);
+    margin: 28px 0 10px;
+  }
+
+  p {
+    color: #3D2215;
+    margin-bottom: 14px;
+    font-weight: 300;
+  }
+
+  strong { font-weight: 600; color: var(--ink); }
+
+  em { font-style: italic; color: #5C3D2E; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(196,98,45,0.08);
+    color: var(--amber);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .rule {
+    border: none;
+    border-top: 1px solid var(--mist);
+    margin: 48px 0;
+  }
+
+  /* ── WORKFLOW STEPS ── */
+  .workflow-steps {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 20px 0;
+  }
+
+  .workflow-steps::before {
+    content: '';
+    position: absolute;
+    left: 21px;
+    top: 22px;
+    bottom: 22px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--amber), rgba(196,98,45,0.08));
+  }
+
+  .wf-step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 18px;
+    align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(196,98,45,0.07);
+  }
+
+  .wf-step:last-child { border-bottom: none; }
+
+  .wf-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--espresso);
+    color: var(--amber);
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    border: 2px solid rgba(196,98,45,0.25);
+  }
+
+  .wf-body h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--espresso);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .wf-body p { font-size: 13px; margin-bottom: 0; }
+
+  .wf-tip {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--amber);
+    background: rgba(196,98,45,0.08);
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid rgba(196,98,45,0.2);
+  }
+
+  /* ── ROLL CARDS ── */
+  .roll-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  .roll-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(196,98,45,0.15);
+  }
+
+  .roll-card-header {
+    padding: 10px 16px;
+  }
+
+  .roll-card-header.aroll { background: #1A2E3A; }
+  .roll-card-header.broll { background: #1A3A2E; }
+
+  .roll-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.06em;
+  }
+
+  .roll-pill.aroll { background: rgba(100,160,200,0.25); color: #7EC8E3; }
+  .roll-pill.broll { background: rgba(100,200,160,0.25); color: #7EE3C8; }
+
+  .roll-card-body {
+    padding: 16px;
+    background: #faf6f1;
+  }
+
+  .roll-card-body h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--espresso);
+    margin-bottom: 4px;
+  }
+
+  .roll-card-body p {
+    font-size: 12px;
+    color: #6B4A35;
+    margin-bottom: 12px;
+  }
+
+  .roll-meta {
+    border-top: 1px solid rgba(196,98,45,0.1);
+    padding-top: 10px;
+  }
+
+  .roll-meta-item {
+    font-size: 11px;
+    color: #6B4A35;
+    margin-bottom: 6px;
+  }
+
+  .roll-meta-item:last-child { margin-bottom: 0; }
+
+  .roll-meta-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  /* ── ISSUE CARDS ── */
+  .issue-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .issue-card {
+    background: #faf6f1;
+    border: 1px solid rgba(196,98,45,0.12);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+
+  .issue-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--espresso);
+    margin-bottom: 5px;
+  }
+
+  .issue-card p { font-size: 13px; margin-bottom: 0; }
+
+  /* ── URL COMPARE ── */
+  .url-compare {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .url-block {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(196,98,45,0.15);
+  }
+
+  .url-block-header {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .url-block-header.bad  { background: rgba(180,40,20,0.1);  color: #C0392B; }
+  .url-block-header.good { background: rgba(30,150,80,0.1);  color: #1E9650; }
+
+  .url-block pre {
+    background: #f0ebe3;
+    padding: 12px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: #3D2215;
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    border-left: 3px solid var(--amber);
+    background: rgba(196,98,45,0.06);
+    padding: 14px 18px;
+    border-radius: 0 5px 5px 0;
+    margin: 16px 0;
+  }
+
+  .callout.warning {
+    border-left-color: #B8860B;
+    background: rgba(184,134,11,0.06);
+  }
+
+  .callout p { margin-bottom: 0; font-size: 13px; }
+
+  .callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid rgba(196,98,45,0.15);
+    margin-bottom: 0;
+  }
+
+  .tab-btn {
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--slate);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+  .tab-btn:hover  { color: var(--ink); }
+
+  .tab-panel { display: none; margin-top: 16px; }
+  .tab-panel.active { display: block; }
+
+  /* ── CONFIG BLOCK ── */
+  .config-block {
+    background: var(--espresso);
+    border-radius: 8px;
+    padding: 20px 22px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--cream);
+    line-height: 1.8;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ── COST GRID ── */
+  .cost-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .cost-card {
+    background: #faf6f1;
+    border: 1px solid rgba(196,98,45,0.12);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .cost-card .cc-label {
+    font-size: 11px;
+    color: var(--slate);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .cost-card .cc-price {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--espresso);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .cost-card .cc-note {
+    font-size: 11px;
+    color: #8A7060;
+    font-weight: 300;
+  }
+
+  /* ── MISTAKE CARDS ── */
+  .mistake-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .mistake-card {
+    background: #faf6f1;
+    border-left: 3px solid #C0392B;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+  }
+
+  .mistake-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--espresso);
+    margin-bottom: 4px;
+  }
+
+  .mistake-card p { font-size: 13px; margin-bottom: 0; }
+
+  /* ── STANDARDS LIST ── */
+  .standards-list {
+    list-style: none;
+    margin: 12px 0;
+  }
+
+  .standards-list li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #3D2215;
+    font-weight: 300;
+    border-bottom: 1px solid rgba(196,98,45,0.07);
+  }
+
+  .standards-list li:last-child { border-bottom: none; }
+
+  .standards-list li::before {
+    content: '✓';
+    color: var(--amber);
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+
+  /* ── NOTE BOX ── */
+  .note-box {
+    background: rgba(100,140,200,0.08);
+    border: 1px solid rgba(100,140,200,0.2);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 24px;
+  }
+
+  .note-box h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #2C5282;
+    margin-bottom: 6px;
+  }
+
+  .note-box p { font-size: 13px; color: #2C5282; margin-bottom: 0; }
+
+  /* ── SCROLL TOP ── */
+  #scroll-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 40px; height: 40px;
+    background: var(--espresso);
+    color: var(--amber);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 200;
+  }
+
+  #scroll-top.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    #sidebar { width: 100%; height: auto; position: relative; }
+    #main { margin-left: 0; padding: 32px 24px 80px; }
+    .roll-grid  { grid-template-columns: 1fr; }
+    .cost-grid  { grid-template-columns: 1fr; }
+    .page-title { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── SIDEBAR ── -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <span class="logo-mark">Kinoko<br>AI Director</span>
+    <span class="version-tag">Operator Guide · v2.1</span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Getting Started</div>
+    <a href="#how-it-runs" class="nav-link active"><span class="nav-dot"></span>How the Workflow Runs</a>
+    <a href="#aroll-broll"  class="nav-link"><span class="nav-dot"></span>A-Roll vs B-Roll</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Production</div>
+    <a href="#broll-generation" class="nav-link"><span class="nav-dot"></span>Generating B-Roll</a>
+    <a href="#iterating"        class="nav-link"><span class="nav-dot"></span>Iterating on Results</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Setup & Reference</div>
+    <a href="#drive-urls"    class="nav-link"><span class="nav-dot"></span>Google Drive URL Rules</a>
+    <a href="#mcp-setup"     class="nav-link"><span class="nav-dot"></span>MCP Setup</a>
+    <a href="#costs"         class="nav-link"><span class="nav-dot"></span>Approximate Costs</a>
+    <a href="#mistakes"      class="nav-link"><span class="nav-dot"></span>Common Mistakes</a>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main id="main">
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-eyebrow">Kinoko · AI Generation</div>
+    <h1 class="page-title">Operator Guide</h1>
+    <p class="page-desc">Step-by-step operating instructions for running Kinoko ad productions via Claude Desktop + Kie.ai. Read this before starting your first session.</p>
+    <div class="badge-row">
+      <span class="badge badge-amber">v2.1 · June 2026</span>
+      <span class="badge badge-slate">Requires Kie.ai MCP</span>
+    </div>
+  </header>
+
+  <!-- ── HOW THE WORKFLOW RUNS ── -->
+  <section class="section" id="how-it-runs">
+    <h2>How the Workflow Runs</h2>
+    <p>Every production session follows the same five-stage sequence. Complete each stage fully before moving to the next — skipping steps wastes credits.</p>
+
+    <div class="workflow-steps">
+      <div class="wf-step">
+        <div class="wf-num">1</div>
+        <div class="wf-body">
+          <h4>Open a fresh session and load the master prompt</h4>
+          <p>Start a new Claude Desktop chat. Paste the full contents of <code>KINOKO_AI_GENERATION_MASTER_v2_1.md</code> at the top. Ask Claude to confirm it has read and understood before you continue — this catches MCP connectivity problems early.</p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">2</div>
+        <div class="wf-body">
+          <h4>Prepare your character reference image</h4>
+          <p>Generate the character in Higgsfield (doctor, UGC creator, etc.). Download the image. Upload it to the Kinoko Google Drive folder. Set sharing to <strong>"Anyone with the link — Viewer"</strong>. Copy the share URL and convert it to the direct-download format — see <a href="#drive-urls" style="color:var(--amber);">Google Drive URL Rules</a> below.</p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">3</div>
+        <div class="wf-body">
+          <h4>Submit the briefing with all required context</h4>
+          <p>Give Claude the script, the Drive direct-download URL of your reference image, the format (A-Roll or B-Roll), and the target ad length. Example: <em>"Here is the briefing. Use this Drive URL as the reference image for every scene. Use Veo 3 Fast. Follow the master prompt."</em></p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">4</div>
+        <div class="wf-body">
+          <h4>Always run 3 test clips before the full batch</h4>
+          <p>Ask Claude to generate the first 3 script lines only. Play them back. If the lipsync, voice tone, and face all match expectations, approve and continue. Full batches consume real credits — a failed run costs the same as a successful one.</p>
+          <span class="wf-tip">⚠ Never skip the test phase</span>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">5</div>
+        <div class="wf-body">
+          <h4>Generate the full batch, then assemble in your editor</h4>
+          <p>Once the test clips pass, tell Claude to generate all remaining scenes. Download every clip within 24 hours — Kie.ai URLs are temporary and expire. Import into Premiere, CapCut, or DaVinci and cut in script order.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── A-ROLL vs B-ROLL ── -->
+  <section class="section" id="aroll-broll">
+    <h2>A-Roll vs B-Roll</h2>
+    <p>Every scene in a Kinoko ad is either A-Roll or B-Roll. The distinction determines which tools are called and how the reference image is handled.</p>
+
+    <div class="roll-grid">
+      <div class="roll-card">
+        <div class="roll-card-header aroll">
+          <span class="roll-pill aroll">A-Roll</span>
+        </div>
+        <div class="roll-card-body">
+          <h4>Person speaking to camera</h4>
+          <p>Doctor authority spots, UGC creator testimonials, or any scene where a character delivers lines directly on screen.</p>
+          <div class="roll-meta">
+            <div class="roll-meta-item">
+              <span class="roll-meta-label">Video tool</span>
+              Veo 3 Fast — native lipsync in DE / FR / IT
+            </div>
+            <div class="roll-meta-item">
+              <span class="roll-meta-label">Reference image</span>
+              One Drive image, reused for every line in the batch
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roll-card">
+        <div class="roll-card-header broll">
+          <span class="roll-pill broll">B-Roll</span>
+        </div>
+        <div class="roll-card-body">
+          <h4>Visuals without spoken dialogue</h4>
+          <p>Pixar-style avatars, 3D body visuals, lifestyle shots, product pours, diagrams — anything supporting the script without requiring lipsync.</p>
+          <div class="roll-meta">
+            <div class="roll-meta-item">
+              <span class="roll-meta-label">Video tool</span>
+              Kling — stylised motion, 3–15s clips
+            </div>
+            <div class="roll-meta-item">
+              <span class="roll-meta-label">Reference image</span>
+              One image per scene, generated fresh via Nano Banana
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── GENERATING B-ROLL ── -->
+  <section class="section" id="broll-generation">
+    <h2>Generating B-Roll</h2>
+    <p>B-Roll is image-first: Nano Banana generates a still, then Kling animates it. Example sequence for a multi-scene B-Roll batch:</p>
+
+    <div class="workflow-steps">
+      <div class="wf-step">
+        <div class="wf-num">1</div>
+        <div class="wf-body">
+          <h4>Write a description for each B-Roll scene</h4>
+          <p>Note what the scene shows, the mood or energy level, and whether a recurring character appears. Specific descriptions produce consistent output.</p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">2</div>
+        <div class="wf-body">
+          <h4>Paste the master prompt, then the scene descriptions</h4>
+          <p>Always load the master prompt first — it carries the visual standards and tool-routing rules that keep B-Roll on-brand.</p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">3</div>
+        <div class="wf-body">
+          <h4>Tell Claude to use Nano Banana + Kling</h4>
+          <p>Example: <em>"Generate the B-Roll images for these scenes using Nano Banana, then animate each one with Kling."</em></p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">4</div>
+        <div class="wf-body">
+          <h4>Claude builds a scene map, submits images in parallel, then animates</h4>
+          <p>All image requests are submitted before Kling is called — faster than scene-by-scene. Review Scene 1 first; if the style and character match, approve the rest of the batch.</p>
+        </div>
+      </div>
+
+      <div class="wf-step">
+        <div class="wf-num">5</div>
+        <div class="wf-body">
+          <h4>Lock character consistency across scenes</h4>
+          <p>B-Roll images are generated from text, so character drift is possible over a long batch. After Scene 1 is approved, tell Claude to use that first image as the <code>image_input</code> reference for all later scenes.</p>
+          <span class="wf-tip">Essential for Pixar avatar sequences</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── ITERATING ── -->
+  <section class="section" id="iterating">
+    <h2>Iterating When Results Don't Match</h2>
+    <p>If the 3 test clips fall short, do not rerun the whole batch. Target the specific problem and fix only that — then retest before scaling.</p>
+
+    <div class="issue-grid">
+      <div class="issue-card">
+        <h4>Face drifts between scenes</h4>
+        <p>Tell Claude: <em>"Use the approved Scene 1 image as the reference for all remaining scenes."</em> Pinning a single source image locks the face across the batch.</p>
+      </div>
+
+      <div class="issue-card">
+        <h4>Voice sounds wrong or unnatural</h4>
+        <p>Regenerate the problem clip and add character context to the prompt — for example: <em>"authoritative German doctor, mid-40s, speaking directly to camera."</em> Tone cues significantly improve voice quality.</p>
+      </div>
+
+      <div class="issue-card">
+        <h4>Audio generates in English instead of German</h4>
+        <p>This is the most common failure. Tell Claude to set <code>enableTranslation: false</code> on every Veo 3 call. Without this flag, Veo 3 may translate the script line before generating audio.</p>
+      </div>
+
+      <div class="issue-card">
+        <h4>A single scene needs regenerating</h4>
+        <p>Say: <em>"Regenerate Scene [X] — reason: [what's wrong]. Use the same seed and reference image."</em> Individual redos cost approximately $0.30 per clip at Veo 3 Fast rates.</p>
+      </div>
+
+      <div class="issue-card">
+        <h4>The prompt itself needs revision</h4>
+        <p>Describe the issue in plain terms — <em>"make the character look younger"</em>, <em>"add warmer lighting"</em>, <em>"remove the mirror from the background."</em> Claude rewrites the prompt and queues another 3-clip test.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── DRIVE URL RULES ── -->
+  <section class="section" id="drive-urls">
+    <h2>Google Drive URL Rules</h2>
+    <p>Kie.ai cannot access images uploaded directly into a Claude chat. Every reference image must be hosted on Google Drive with public sharing enabled, and the URL must be in the <strong>direct-download format</strong> — not the default share link Google gives you.</p>
+
+    <div class="url-compare">
+      <div class="url-block">
+        <div class="url-block-header bad">✗ &nbsp;Default share link — do not use</div>
+        <pre>https://drive.google.com/file/d/FILE_ID/view?usp=sharing</pre>
+      </div>
+      <div class="url-block">
+        <div class="url-block-header good">✓ &nbsp;Direct-download URL — use this</div>
+        <pre>https://drive.google.com/uc?export=download&amp;id=FILE_ID</pre>
+      </div>
+    </div>
+
+    <p>Copy the <code>FILE_ID</code> from the share link — it is the long alphanumeric string between <code>/d/</code> and <code>/view</code> — then paste it into the direct-download pattern above.</p>
+
+    <div class="callout warning">
+      <div class="callout-label">Critical — Sharing permission</div>
+      <p>Always set the Drive file to <strong>"Anyone with the link — Viewer"</strong> before copying the URL. If sharing is restricted, Kie.ai fails silently — the batch appears to run but produces no output, and the credits are still consumed.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Which Drive folder to use</div>
+      <p>Always upload to the Kinoko-owned shared Drive folder, not a personal Google account. Personal Drive files can have quota and access limits that cause intermittent failures on large batches, even when set to "Anyone with the link."</p>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── MCP SETUP ── -->
+  <section class="section" id="mcp-setup">
+    <h2>Kie.ai MCP Setup</h2>
+    <p>One-time setup per machine. The MCP server lets Claude Desktop call Kie.ai tools directly during a chat. If anything goes wrong after setup, share the error message with Claude in chat — it can usually diagnose the problem.</p>
+
+    <h3>Before You Start — Both Platforms</h3>
+    <ul class="standards-list">
+      <li>Install <strong>Claude Desktop</strong> from <code>claude.ai/download</code></li>
+      <li>Log in to Kie.ai and generate an API key from your account settings</li>
+      <li>Install <strong>Node.js LTS</strong> from <code>nodejs.org</code> — the MCP server package requires it</li>
+      <li>Store your Kie.ai API key in a password manager — you will paste it into a config file</li>
+    </ul>
+
+    <h3>Platform Setup Steps</h3>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab(this,'tab-win')">Windows</button>
+      <button class="tab-btn"        onclick="switchTab(this,'tab-mac')">Mac</button>
+    </div>
+
+    <div id="tab-win" class="tab-panel active">
+      <ul class="standards-list" style="margin-top:16px">
+        <li>Close Claude Desktop if it is currently running</li>
+        <li>Open File Explorer and paste <code>%APPDATA%\Claude</code> into the address bar</li>
+        <li>Open <code>claude_desktop_config.json</code> in Notepad — or create it if it does not exist</li>
+        <li>Paste the config snippet below and replace <code>YOUR_KIE_AI_KEY</code> with your actual key</li>
+        <li>Save the file, then restart Claude Desktop</li>
+        <li>Open a new chat and type <em>"list available tools"</em> — you should see <code>nano_banana_image</code>, <code>veo3_generate_video</code>, and <code>kling_video</code>. If not, ask Claude to help debug.</li>
+      </ul>
+    </div>
+
+    <div id="tab-mac" class="tab-panel">
+      <ul class="standards-list" style="margin-top:16px">
+        <li>Close Claude Desktop if it is currently running</li>
+        <li>Open Finder → press <code>⌘ + Shift + G</code> → paste <code>~/Library/Application Support/Claude</code></li>
+        <li>Open <code>claude_desktop_config.json</code> in TextEdit — or create it if it does not exist</li>
+        <li>Paste the config snippet below and replace <code>YOUR_KIE_AI_KEY</code> with your actual key</li>
+        <li>Save as <strong>plain text</strong> and restart Claude Desktop</li>
+        <li>Open a new chat and type <em>"list available tools"</em> — confirm the Kie.ai tools are listed. If not, ask Claude to diagnose.</li>
+      </ul>
+    </div>
+
+    <h3>Config Snippet — Both Platforms</h3>
+    <div class="config-block">{
+  "mcpServers": {
+    "kie-ai": {
+      "command": "npx",
+      "args": ["-y", "@kie-ai/mcp-server"],
+      "env": {
+        "KIE_AI_API_KEY": "YOUR_KIE_AI_KEY"
+      }
+    }
+  }
+}</div>
+
+    <div class="callout">
+      <p>The package name <code>@kie-ai/mcp-server</code> may change. If the connection fails, check the Kie.ai documentation for the current package name and update the <code>args</code> field.</p>
+    </div>
+
+    <div class="note-box">
+      <h4>Stuck on something?</h4>
+      <p>Ask Claude directly in chat — it can diagnose MCP connection issues, walk through config errors, and suggest prompt fixes. Share the exact error message and what you already tried.</p>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── COSTS ── -->
+  <section class="section" id="costs">
+    <h2>Approximate Costs</h2>
+    <p>Per-asset pricing on Kie.ai as of June 2026. Check your Kie.ai dashboard for current credit values before a large batch.</p>
+
+    <div class="cost-grid">
+      <div class="cost-card">
+        <div class="cc-label">Nano Banana image</div>
+        <div class="cc-price">~$0.12</div>
+        <div class="cc-note">at 2K resolution</div>
+      </div>
+      <div class="cost-card">
+        <div class="cc-label">Veo 3 Fast</div>
+        <div class="cc-price">~$0.30</div>
+        <div class="cc-note">per 8-second clip</div>
+      </div>
+      <div class="cost-card">
+        <div class="cc-label">Kling standard</div>
+        <div class="cc-price">~$0.50</div>
+        <div class="cc-note">per 5-second clip</div>
+      </div>
+      <div class="cost-card">
+        <div class="cc-label">Full 45s A-Roll batch</div>
+        <div class="cc-price">~$4–6</div>
+        <div class="cc-note">including 1–2 expected redos</div>
+      </div>
+    </div>
+
+    <div class="callout warning">
+      <div class="callout-label">Budget tip</div>
+      <p>Always run 3 test clips before a full batch. A failed 10-clip Veo 3 Fast run costs ~$3 with nothing usable to show for it. The test phase saves more than it costs.</p>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <!-- ── COMMON MISTAKES ── -->
+  <section class="section" id="mistakes">
+    <h2>Common Mistakes to Avoid</h2>
+
+    <div class="mistake-list">
+      <div class="mistake-card">
+        <h4>Uploading reference images directly into the Claude chat</h4>
+        <p>Kie.ai has no access to files attached in Claude's chat window. Always upload to Google Drive first, set sharing to "Anyone with the link — Viewer", and paste the direct-download URL into the session.</p>
+      </div>
+
+      <div class="mistake-card">
+        <h4>Running the full batch before testing</h4>
+        <p>Always generate 3 clips first, verify quality, then scale. A full batch that fails due to a wrong URL or incorrect language setting loses real money with nothing to show for it.</p>
+      </div>
+
+      <div class="mistake-card">
+        <h4>Not downloading clips within 24 hours</h4>
+        <p>Kie.ai output URLs expire after approximately 24 hours. Download every clip on the same day you generate it — the session log does not preserve access to expired files.</p>
+      </div>
+
+      <div class="mistake-card">
+        <h4>Using a personal Google Drive instead of the Kinoko folder</h4>
+        <p>Always upload to the Kinoko-owned shared Drive. Personal Drive links can fail when fetched programmatically even when they appear accessible in a browser.</p>
+      </div>
+
+      <div class="mistake-card">
+        <h4>Starting a new session without reloading the master prompt</h4>
+        <p>Claude has no memory between separate chat sessions. Every new session starts blank. Paste the master prompt and any active briefing context at the top of each new chat before doing anything else.</p>
+      </div>
+    </div>
+
+    <div class="note-box">
+      <h4>Higgsfield still works for manual generation</h4>
+      <p>The Claude + Kie.ai workflow is faster and cheaper for batches, but nothing forces you to use it exclusively. Higgsfield remains available for one-off manual generations. The speed and cost advantages of the Claude workflow are most visible on full ad batches — try it on your next job.</p>
+    </div>
+  </section>
+
+</main>
+
+<button id="scroll-top" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  // Scroll-to-top
+  const scrollBtn = document.getElementById('scroll-top');
+  window.addEventListener('scroll', () => {
+    scrollBtn.classList.toggle('visible', window.scrollY > 400);
+  });
+
+  // Active nav highlighting
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks  = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Tab switching
+  function switchTab(btn, panelId) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+</script>
+</body>
+</html>
